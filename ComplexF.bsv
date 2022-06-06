@@ -26,9 +26,7 @@
 typedef struct{
   Bit#(n) i;
   Bit#(n) q;
-}
- ComplexF#(numeric type n) deriving(Eq, Bits);
-
+} ComplexF#(numeric type n) deriving(Eq, Bits);
 
 function Int#(n)  toInt(Bit#(n) x)= unpack(x);
 function Bit#(n) toBit(Int#(n) x)= pack(x);
@@ -55,13 +53,13 @@ instance BitExtend#(n,m, ComplexF) provisos(Add#(k,n,m));
      function ComplexF#(m) zeroExtend(ComplexF#(n) x);
        return ComplexF{
                 i: zeroExtend(x.i),
-                q: zeroExtend(x.q)                 
+                q: zeroExtend(x.q)
               };
      endfunction
      function ComplexF#(m) signExtend(ComplexF#(n) x);
        return ComplexF{
                 i: signExtend(x.i),
-                q: signExtend(x.q)                 
+                q: signExtend(x.q)
               };
      endfunction
      function ComplexF#(n) truncate(ComplexF#(m) x);
@@ -69,11 +67,11 @@ instance BitExtend#(n,m, ComplexF) provisos(Add#(k,n,m));
        Nat rmin = fromInteger(valueOf(m) - valueOf(n));
        return ComplexF{
                 i: x.i[rmax:rmin],
-                q: x.q[rmax:rmin]                 
+                q: x.q[rmax:rmin]
               };
      endfunction
 endinstance
-   
+
 function Bit#(n) complex_add(Bit#(n) x, Bit#(n) y) provisos(Add#(1,k,n), Add#(1,n, TAdd#(1,n)));
   Nat              si = fromInteger(valueOf(n) - 1);
   Nat          si_p_1 = fromInteger(valueOf(n));
@@ -97,10 +95,9 @@ function Bit#(n) complex_sub(Bit#(n) x, Bit#(n) y) provisos(Add#(1,k,n), Add#(1,
   Bit#(n)         res = (pack(ir))[si_p_1:1];
   return  res;
 endfunction
-   
-   
+
 function Bit#(n) complex_mult(Bit#(n) x, Bit#(n) y) provisos(Add#(k,n,TAdd#(n,n)));
-  Nat                si = fromInteger(valueOf(n) - 1) ; 
+  Nat                si = fromInteger(valueOf(n) - 1) ;
   Nat               si2 = fromInteger(2*(valueOf(n) - 1));
   Nat              si_1 = fromInteger(valueOf(n) - 2); // 14 for 16
   Bit#(TAdd#(n,n)) half = 1 << (si_1);
@@ -125,7 +122,7 @@ instance Arith#(ComplexF#(n)) provisos(Add#(1,k,n), Add#(k2,n,TAdd#(n,n)), Add#(
               i: complex_add(x.i, y.i),
               q: complex_add(x.q, y.q)
              };
-  endfunction     
+  endfunction
 
   function ComplexF#(n) \- (ComplexF#(n) x, ComplexF#(n) y);
      return ComplexF{
@@ -145,7 +142,7 @@ instance Arith#(ComplexF#(n)) provisos(Add#(1,k,n), Add#(k2,n,TAdd#(n,n)), Add#(
              q: complex_sub(qi, iq)
             };
   endfunction
-  
+
   function ComplexF#(n) negate (ComplexF#(n) x);
     return ComplexF{
               i: negate(x.i),

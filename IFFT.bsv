@@ -35,61 +35,59 @@ import Vector::*;
 
 
 (* synthesize *)
-module  mkIFFT_Circ(IFFT#(64));
+module [Module] mkIFFT_Circ(IFFT#(64));
   let _x <- mkIFFT(mkPipeline_Circ(2'd3, 2'd1, stagefunction));
   return (_x);
-endmodule  
+endmodule
 
 (* synthesize *)
-module  mkIFFT_Pipe(IFFT#(64));
+module [Module]  mkIFFT_Pipe(IFFT#(64));
   let _x <- mkIFFT(mkPipeline_Sync(2'd3, 2'd1, stagefunction));
   return (_x);
-endmodule  
+endmodule
 
 (* synthesize *)
-module  mkIFFT_Comb(IFFT#(64));
+module [Module]  mkIFFT_Comb(IFFT#(64));
   let _x <- mkIFFT(mkPipeline_Comb(2'd3, 2'd1, stagefunction));
   return (_x);
-endmodule  
+endmodule
 
 (* synthesize *)
-module  mkIFFT_Circ_w_1Radix(IFFT#(64));
+module [Module]  mkIFFT_Circ_w_1Radix(IFFT#(64));
   let _x <- mkIFFT(mkPipeline_Circ(6'd48, 6'd1, stagefunction2));
   return (_x);
-endmodule  
+endmodule
 
 (* synthesize *)
-module  mkIFFT_Circ_w_2Radix(IFFT#(64));
+module [Module]  mkIFFT_Circ_w_2Radix(IFFT#(64));
   let _x <- mkIFFT(mkPipeline_Circ(6'd48, 6'd2, stagefunction2));
   return (_x);
-endmodule 
+endmodule
 
 (* synthesize *)
-module  mkIFFT_Circ_w_4Radix(IFFT#(64));
+module  [Module] mkIFFT_Circ_w_4Radix(IFFT#(64));
   let _x <- mkIFFT(mkPipeline_Circ(6'd48, 6'd4, stagefunction2));
   return (_x);
-endmodule 
+endmodule
 
 (* synthesize *)
-module  mkIFFT_Circ_w_8Radix(IFFT#(64));
+module [Module]  mkIFFT_Circ_w_8Radix(IFFT#(64));
   let _x <- mkIFFT(mkPipeline_Circ(6'd48, 6'd8, stagefunction2));
   return (_x);
-endmodule 
+endmodule
 
+module [Module] mkIFFT#(Module#(Pipeline#(IFFTData)) mkP) (IFFT#(64));
 
-module [Module] mkIFFT#(Module#(Pipeline#(IFFTData)) mkP)
-              (IFFT#(64));
+   Pipeline#(IFFTData) p <- mkP();
 
-   Pipeline#(IFFTData) p <- mkP(); 
-  
    method Action fromMapper(MsgComplexFVec#(64) x);
      IFFTData data = x.data;
      IFFTData reordered_data = newVector();
      for(Integer i = 0; i < 64; i = i + 1)
        begin
          // note swapped values
-	 reordered_data[i].i = data[63-reorder[i]].q;
-	 reordered_data[i].q = data[63-reorder[i]].i;
+	        reordered_data[i].i = data[63-reorder[i]].q;
+	        reordered_data[i].q = data[63-reorder[i]].i;
        end
      p.put(reordered_data);
    endmethod
@@ -103,17 +101,13 @@ module [Module] mkIFFT#(Module#(Pipeline#(IFFTData)) mkP)
      IFFTData data_out = newVector();
      for(Integer i = 0; i < 64; i = i + 1)
        begin
-	 data_out[i].i = data[63-i].q;
-	 data_out[i].q = data[63-i].i;
+	       data_out[i].i = data[63-i].q;
+	       data_out[i].q = data[63-i].i;
        end
      return(MsgComplexFVec{
-              new_message: True, 
-	      data       : data_out
+              new_message: True,
+              data       : data_out
              });
    endmethod
 
-  
-  
-  
-  
 endmodule

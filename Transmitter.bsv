@@ -42,53 +42,53 @@ import Scrambler::*;
 
 
 (* synthesize *)
-module mkTransmitter_Pipe(Transmitter#(24,81));
+module [Module] mkTransmitter_Pipe(Transmitter#(24,81));
   let ifft <- mkIFFT_Pipe();
-  let _x <- mkTransmitter(ifft);   
-  return _x; 
+  let _x <- mkTransmitter(ifft);
+  return _x;
 endmodule
 
 (* synthesize *)
-module mkTransmitter_Comb(Transmitter#(24,81));
+module [Module] mkTransmitter_Comb(Transmitter#(24,81));
   let ifft <- mkIFFT_Comb();
-  let _x <- mkTransmitter(ifft); 
-  return _x; 
+  let _x <- mkTransmitter(ifft);
+  return _x;
 endmodule
 
 (* synthesize *)
-module mkTransmitter_Circ(Transmitter#(24,81));
+module [Module] mkTransmitter_Circ(Transmitter#(24,81));
   let ifft <- mkIFFT_Circ();
-  let _x <- mkTransmitter(ifft);   
-  return _x; 
+  let _x <- mkTransmitter(ifft);
+  return _x;
 endmodule
 
 (* synthesize *)
-module mkTransmitter_1Radix(Transmitter#(24,81));
+module [Module] mkTransmitter_1Radix(Transmitter#(24,81));
   let ifft <- mkIFFT_Circ_w_1Radix();
-  let _x <- mkTransmitter(ifft);   
-  return _x; 
+  let _x <- mkTransmitter(ifft);
+  return _x;
 endmodule
 
 (* synthesize *)
-module mkTransmitter_2Radix(Transmitter#(24,81));
+module [Module] mkTransmitter_2Radix(Transmitter#(24,81));
   let ifft <- mkIFFT_Circ_w_2Radix();
-  let _x <- mkTransmitter(ifft);   
-  return _x; 
+  let _x <- mkTransmitter(ifft);
+  return _x;
 endmodule
 
 
 (* synthesize *)
-module mkTransmitter_4Radix(Transmitter#(24,81));
+module [Module] mkTransmitter_4Radix(Transmitter#(24,81));
   let ifft <- mkIFFT_Circ_w_4Radix();
-  let _x <- mkTransmitter(ifft);   
-  return _x; 
+  let _x <- mkTransmitter(ifft);
+  return _x;
 endmodule
 
 (* synthesize *)
-module mkTransmitter_8Radix(Transmitter#(24,81));
+module [Module] mkTransmitter_8Radix(Transmitter#(24,81));
   let ifft <- mkIFFT_Circ_w_8Radix();
-  let _x <- mkTransmitter(ifft);   
-  return _x; 
+  let _x <- mkTransmitter(ifft);
+  return _x;
 endmodule
 
 module [Module] mkTransmitter#(IFFT#(64) ifft)(Transmitter#(24,81));
@@ -96,14 +96,14 @@ module [Module] mkTransmitter#(IFFT#(64) ifft)(Transmitter#(24,81));
   function Action stitch(ActionValue#(a) x, function Action f(a v));
     action
       let v <- x;
-      f(v); 
-    endaction 				
+      f(v);
+    endaction
   endfunction
-   
-  let controller   <- mkController();   
-  let scrambler    <- mkScrambler_48();     
+
+  let controller   <- mkController();
+  let scrambler    <- mkScrambler_48();
   let conv_encoder <- mkConvEncoder_24_48();
-  let interleaver  <- mkInterleaver(); 
+  let interleaver  <- mkInterleaver();
   let mapper       <- mkMapper_48_64();
   //  let ifft         <- mkIFFT();
   let cyc_extender <- mkCyclicExtender();
@@ -111,15 +111,15 @@ module [Module] mkTransmitter#(IFFT#(64) ifft)(Transmitter#(24,81));
    rule controller2scrambler(True);
       stitch(controller.getData, scrambler.fromControl);
    endrule
-   
+
    rule controller2conv_encoder(True);
       stitch(controller.getHeader,conv_encoder.encode_fromController);
-   endrule   
+   endrule
 
    rule scrambler2conv_encoder(True);
       stitch(scrambler.toEncoder, conv_encoder.encode_fromScrambler);
-   endrule   
-  
+   endrule
+
    rule conv_encoder2interleaver(True);
       stitch(conv_encoder.getOutput, interleaver.fromEncoder);
    endrule
@@ -127,11 +127,11 @@ module [Module] mkTransmitter#(IFFT#(64) ifft)(Transmitter#(24,81));
    rule interleaver2mapper(True);
       stitch(interleaver.toMapper, mapper.fromInterleaver);
    endrule
- 
+
    rule mapper2ifft(True);
       stitch(mapper.toIFFT, ifft.fromMapper);
    endrule
-     
+
    rule ifft2cyclicExtender(True);
       stitch(ifft.toCyclicExtender, cyc_extender.fromIFFT);
    endrule
@@ -140,13 +140,13 @@ module [Module] mkTransmitter#(IFFT#(64) ifft)(Transmitter#(24,81));
      let x <- cyc_extender.toAnalogTX();
      return(x);
    endmethod
-     
+
    method Action getFromMAC(TXMAC2ControllerInfo x);
-     controller.getFromMAC(x); 
+     controller.getFromMAC(x);
    endmethod
-     
-   method Action getDataFromMAC(Data#(24) x); 
+
+   method Action getDataFromMAC(Data#(24) x);
      controller.getDataFromMAC(x);
-   endmethod 
-     
+   endmethod
+
 endmodule
